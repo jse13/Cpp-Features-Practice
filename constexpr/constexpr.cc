@@ -1,18 +1,28 @@
-// arne-mertz.de/2017/03/constexpr-additions-c17/ 
 #include <iostream>
+#include <string_view>
+using namespace std::literals::string_view_literals;
 
-using namespace std;
-
-int baz() { return 4; };
-
-template< class T >
-void fcn( T&& foo )
+constexpr unsigned fibonacci( const unsigned x )
 {
-	cout << foo << endl;
+    return x <= 1 ? 1 : fibonacci( x - 1 ) + fibonacci( x - 2 );
 }
 
-int main() 
+//  Won't compile if constexpr; constexpr fcns can only call other constexpr fcns.
+//  iostream functions are not constexpr.
+// constexpr void do_fibonacci()
+void do_fibonacci()
 {
-	fcn( baz() );
+    std::cout << fibonacci( 5 ) << "\n"sv; // Valid, calculated at compile time
+
+    unsigned x = 4;
+    std::cout << fibonacci( x ) << "\n"sv; // Valid, calculated at compile time
+
+    std::cin >> x;
+    std::cout << fibonacci( x ) << "\n"sv; //  Valid, but no compile time calculations made
 }
 
+int main()
+{
+    do_fibonacci();
+    return 0;
+}
